@@ -321,7 +321,7 @@ function initialize() {
     editor.setHighlightActiveLine(false);
     editor.getSession().setUseWrapMode(true);
     editor.getSession().setMode("ace/mode/sql");
-    editor.setOptions({maxLines: 5});
+    editor.setOptions({minLines: 3, maxLines: 20});
     editor.setFontSize(16);
 
     $(".no-propagate").on("click", function (el) {
