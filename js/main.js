@@ -79,7 +79,7 @@ function initialize() {
             return results[1] || 0;
         }
     };
-    const loadUrlDB = $.urlParam("url");
+    const loadUrlDB = "examples/Chinook_Sqlite.sqlite";
     if (loadUrlDB != null) {
         setIsLoading(true);
         const xhr = new XMLHttpRequest();

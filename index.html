@@ -13,26 +13,19 @@
     <link href="css/main.css" rel="stylesheet">
     <link rel="image_src" href="img/icon.png" />
     <link rel="icon" type="image/png" href="img/icon.png"/>
+    <!-- TODO: Change metadata -->
     <meta property="og:url" content="https://inloop.github.io/sqlite-viewer/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="SQLite Viewer">
     <meta property="og:description" content="sqlite file viewer">
     <meta property="og:image" content="https://inloop.github.io/sqlite-viewer/img/icon.png">
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N22SYDVQHZ"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-N22SYDVQHZ');
-    </script>
 </head>
 <body>
 
 <img src="img/icon.png" style="display: none;"/>
 
 <div id="main-container" class="container shadow bg-white">
-    <header id="header" class="row align-items-center p-4">
+    <header id="header" class="row align-items-center p-4 mb-3">
         <img src="img/logo.svg" width="54" height="54" class="col-auto p-0" alt="Database logo"/>
 
         <div class="col">
@@ -54,7 +47,7 @@
         Sorry but your browser does not support some of new HTML5 features! Try using latest version of Google Chrome or Firefox.
     </div>
 
-    <div class="row text-center p-3 align-items-stretch" id="dropzone" onclick="dropzoneClick(this)">
+    <!-- <div class="row text-center p-3 align-items-stretch" id="dropzone" onclick="dropzoneClick(this)">
         <div class="d-flex border border-info-subtle rounded-1 align-items-center justify-content-center">
             <div id="drop-text">
                 <b>Drop file here</b> to load content or click on this box to open file dialog.<br/>
@@ -72,7 +65,7 @@
                 <b>Processing file...</b>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div id="output-box" class="container-fluid">
         <div class="input-group">
@@ -130,8 +123,8 @@
 </div>
 
 <footer class="col text-center text-secondary py-2 my-1 small" id="footer">
-    <a href="https://yuraj11.github.io" class="text-decoration-none">&copy; 2024 Juraj Novák</a><br>
-    <small>| <a href="https://github.com/inloop/sqlite-viewer" class="text-decoration-none link-opacity-75">Fork me on GitHub</a> |</small>
+    Basierend auf der Arbeit von Juraj Novák (&copy; 2024; Url: <a href="https://yuraj11.github.io" class="text-decoration-none">https://yuraj11.github.io</a>) 
+    <br>
 </footer>
 
 <input type="file" id="dropzone-dialog" style="opacity: 0;display:none">
