@@ -24,6 +24,263 @@ const selectFormatter = function (item) {
     }
 };
 
+// Query History Manager
+const QueryHistory = {
+    STORAGE_KEY: 'sqlite-viewer-query-history',
+    MAX_QUERIES: 100,
+    queries: [],
+    sidebarCollapsed: false,
+
+    // Initialize on page load
+    init() {
+        this.loadHistory();
+        this.renderHistory();
+        this.attachEventListeners();
+        this.restoreSidebarState();
+        this.startTimestampUpdates();
+
+        // Listen for storage events from other tabs
+        window.addEventListener('storage', (e) => {
+            if (e.key === this.STORAGE_KEY) {
+                this.loadHistory();
+                this.renderHistory();
+            }
+        });
+    },
+
+    // Load from localStorage
+    loadHistory() {
+        try {
+            const stored = localStorage.getItem(this.STORAGE_KEY);
+            if (stored) {
+                const data = JSON.parse(stored);
+                this.queries = data.queries || [];
+                this.sidebarCollapsed = data.sidebarCollapsed || false;
+            } else {
+                this.queries = [];
+                this.sidebarCollapsed = false;
+            }
+        } catch (e) {
+            console.error('Failed to parse query history:', e);
+            this.queries = [];
+            this.sidebarCollapsed = false;
+        }
+    },
+
+    // Save to localStorage
+    saveHistory() {
+        try {
+            const data = {
+                queries: this.queries,
+                sidebarCollapsed: this.sidebarCollapsed
+            };
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.warn('localStorage quota exceeded, reducing history size');
+                this.MAX_QUERIES = 50;
+                this.queries = this.queries.slice(0, 50);
+                try {
+                    const data = {
+                        queries: this.queries,
+                        sidebarCollapsed: this.sidebarCollapsed
+                    };
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+                } catch (e2) {
+                    console.error('Failed to save query history even after reduction:', e2);
+                }
+            } else {
+                console.error('Failed to save query history:', e);
+            }
+        }
+    },
+
+    // Add query (called from executeSql)
+    addQuery(sql) {
+        const trimmed = sql.trim();
+        if (!trimmed) return;
+
+        // Truncate very long queries
+        const maxLength = 5000;
+        const storedSql = trimmed.length > maxLength ? trimmed.substring(0, maxLength) + '...[truncated]' : trimmed;
+
+        // Deduplication: remove if exists, will re-add at top
+        const existingIndex = this.queries.findIndex(q => q.sql === storedSql);
+        if (existingIndex > -1) {
+            this.queries.splice(existingIndex, 1);
+        }
+
+        // Add new query at the beginning
+        const query = {
+            id: Date.now().toString(),
+            sql: storedSql,
+            timestamp: Date.now(),
+            truncated: this.truncateQuery(storedSql, 50)
+        };
+
+        this.queries.unshift(query);
+
+        // Enforce max limit
+        if (this.queries.length > this.MAX_QUERIES) {
+            this.queries = this.queries.slice(0, this.MAX_QUERIES);
+        }
+
+        this.saveHistory();
+        this.renderHistory();
+    },
+
+    // Truncate query for display
+    truncateQuery(sql, maxLength) {
+        if (sql.length <= maxLength) return sql;
+        return sql.substring(0, maxLength) + '...';
+    },
+
+    // Format timestamp
+    formatTimestamp(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        const seconds = Math.floor(diff / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+
+        if (seconds < 60) return 'Just now';
+        if (minutes < 60) return `${minutes} min ago`;
+        if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        if (days === 1) return 'Yesterday';
+        if (days < 7) return `${days} days ago`;
+
+        const date = new Date(timestamp);
+        const yearAgo = now - (365 * 24 * 60 * 60 * 1000);
+
+        return new Intl.DateTimeFormat('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: timestamp < yearAgo ? 'numeric' : undefined
+        }).format(date);
+    },
+
+    // Render query list
+    renderHistory() {
+        const container = document.getElementById('query-history-list');
+        if (!container) return;
+
+        if (this.queries.length === 0) {
+            container.innerHTML = '<div class="text-center text-muted p-4 small">No queries yet. Execute a query to see it here.</div>';
+            return;
+        }
+
+        container.innerHTML = this.queries.map(query => {
+            const timestamp = this.formatTimestamp(query.timestamp);
+            const escapedSql = this.escapeHtml(query.sql);
+            const escapedTruncated = this.escapeHtml(query.truncated);
+
+            return `
+                <div class="query-item bg-white border rounded p-2 mb-2" data-query-id="${query.id}" data-sql="${this.escapeAttr(query.sql)}">
+                    <div class="d-flex flex-column">
+                        <pre class="query-sql mb-0 small font-monospace text-secondary"><code>${escapedTruncated}</code></pre>
+                        <time class="query-timestamp small text-muted mt-2" datetime="${new Date(query.timestamp).toISOString()}">${timestamp}</time>
+                    </div>
+                    <div class="query-tooltip position-fixed bg-white border border-primary rounded shadow-lg p-3">
+                        <pre class="mb-0 small font-monospace"><code>${escapedSql}</code></pre>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Attach click handlers
+        container.querySelectorAll('.query-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const sql = e.currentTarget.getAttribute('data-sql');
+                this.loadQueryToEditor(sql);
+            });
+        });
+    },
+
+    // Load query into ACE editor
+    loadQueryToEditor(sql) {
+        editor.setValue(sql, -1);
+        editor.focus();
+    },
+
+    // Clear all history
+    clearHistory() {
+        if (confirm('Clear all query history? This cannot be undone.')) {
+            this.queries = [];
+            this.saveHistory();
+            this.renderHistory();
+        }
+    },
+
+    // Toggle sidebar
+    toggleSidebar() {
+        this.sidebarCollapsed = !this.sidebarCollapsed;
+        this.saveHistory();
+        this.applySidebarState();
+    },
+
+    // Apply sidebar collapsed state
+    applySidebarState() {
+        const sidebar = document.getElementById('query-history-sidebar');
+        const toggle = document.getElementById('sidebar-toggle');
+
+        if (!sidebar || !toggle) return;
+
+        if (this.sidebarCollapsed) {
+            sidebar.classList.add('collapsed');
+            toggle.querySelector('.icon-expand').style.display = 'block';
+            toggle.querySelector('.icon-collapse').style.display = 'none';
+        } else {
+            sidebar.classList.remove('collapsed');
+            toggle.querySelector('.icon-expand').style.display = 'none';
+            toggle.querySelector('.icon-collapse').style.display = 'block';
+        }
+    },
+
+    // Restore sidebar state from localStorage
+    restoreSidebarState() {
+        this.applySidebarState();
+    },
+
+    // Attach event listeners
+    attachEventListeners() {
+        // Sidebar toggle
+        const toggle = document.getElementById('sidebar-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', () => this.toggleSidebar());
+        }
+
+        // Clear history button
+        const clearBtn = document.getElementById('clear-history-btn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => this.clearHistory());
+        }
+    },
+
+    // Update timestamps periodically
+    startTimestampUpdates() {
+        setInterval(() => {
+            const timestamps = document.querySelectorAll('.query-timestamp');
+            timestamps.forEach((el, index) => {
+                if (this.queries[index]) {
+                    el.textContent = this.formatTimestamp(this.queries[index].timestamp);
+                }
+            });
+        }, 60000); // Update every minute
+    },
+
+    // HTML escape utilities
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    },
+
+    escapeAttr(text) {
+        return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+};
+
 initialize();
 
 function initialize() {
@@ -93,6 +350,9 @@ function initialize() {
         };
         xhr.send();
     }
+
+    // Initialize query history
+    QueryHistory.init();
 }
 
 function loadDB(arrayBuffer) {
@@ -247,6 +507,7 @@ function doDefaultSelect(name) {
 
 function executeSql() {
     const query = editor.getValue();
+    QueryHistory.addQuery(query);
     renderQuery(query);
     $("#tables").val(getTableNameFromQuery(query));
 }

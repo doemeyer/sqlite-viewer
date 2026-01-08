@@ -1,53 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="description" content="sqlite file viewer">
-    <meta name="keywords" content="sqlite,viewer,db,database,online">
-    <meta name="author" content="Juraj Novák">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="sqlite file viewer" />
+    <meta name="keywords" content="sqlite,viewer,db,database,online" />
+    <meta name="author" content="Juraj Novák" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SQLite Viewer</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/select2.min.css" rel="stylesheet">
-    <link href="css/select2-bootstrap-5-theme.min.css" rel="stylesheet">
-    <link href="css/main.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/select2.min.css" rel="stylesheet" />
+    <link href="css/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <link href="css/main.css" rel="stylesheet" />
     <link rel="image_src" href="img/icon.png" />
-    <link rel="icon" type="image/png" href="img/icon.png"/>
+    <link rel="icon" type="image/png" href="img/icon.png" />
     <!-- TODO: Change metadata -->
-    <meta property="og:url" content="https://inloop.github.io/sqlite-viewer/">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="SQLite Viewer">
-    <meta property="og:description" content="sqlite file viewer">
-    <meta property="og:image" content="https://inloop.github.io/sqlite-viewer/img/icon.png">
-</head>
-<body>
+    <meta property="og:url" content="https://inloop.github.io/sqlite-viewer/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SQLite Viewer" />
+    <meta property="og:description" content="sqlite file viewer" />
+    <meta
+      property="og:image"
+      content="https://inloop.github.io/sqlite-viewer/img/icon.png"
+    />
+  </head>
+  <body>
+    <img src="img/icon.png" style="display: none" />
 
-<img src="img/icon.png" style="display: none;"/>
+    <div id="app-wrapper" class="d-flex min-vh-100">
+      <!-- Query History Sidebar -->
+      <aside
+        id="query-history-sidebar"
+        class="d-flex flex-column bg-light border-end query-sidebar"
+      >
+        <div
+          class="d-flex justify-content-between align-items-center px-2 py-2 bg-white border-bottom"
+        >
+          <h6 class="mb-0 text-primary fw-semibold">Recent Queries</h6>
+          <button
+            id="clear-history-btn"
+            class="btn btn-sm btn-outline-danger"
+            title="Clear all history"
+          >
+            Clear
+          </button>
+        </div>
+        <div
+          id="query-history-list"
+          class="flex-grow-1 overflow-auto p-2 query-list"
+        >
+          <!-- Query items will be rendered here by JavaScript -->
+        </div>
+      </aside>
 
-<div id="main-container" class="container shadow bg-white">
-    <header id="header" class="row align-items-center p-4 mb-3">
-        <img src="img/logo.svg" width="54" height="54" class="col-auto p-0" alt="Database logo"/>
+      <!-- Sidebar Toggle Button -->
+      <button
+        id="sidebar-toggle"
+        class="position-fixed btn btn-light border shadow-sm sidebar-toggle"
+        aria-label="Toggle query history"
+      >
+        <svg
+          class="icon-expand"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
+          />
+        </svg>
+        <svg
+          class="icon-collapse"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+          />
+        </svg>
+      </button>
 
-        <div class="col">
+      <div id="main-container" class="container shadow bg-white flex-grow-1">
+        <header id="header" class="row align-items-center p-4 mb-3">
+          <img
+            src="img/logo.svg"
+            width="54"
+            height="54"
+            class="col-auto p-0"
+            alt="Database logo"
+          />
+
+          <div class="col">
             <h4 class="mb-0">SQLite Viewer</h4>
             <p class="mb-0">view sqlite file online</p>
+          </div>
+
+          <a
+            href="#"
+            id="resizer"
+            aria-label="Expand/Collapse"
+            class="col-auto text-decoration-none"
+            style="color: #3474a8"
+          >
+            <svg
+              id="resizer-expand"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              class="bi bi-arrows-angle-expand"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707"
+              />
+            </svg>
+            <svg
+              id="resizer-collapse"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              class="bi bi-arrows-angle-contract collapse"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707M15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707"
+              />
+            </svg>
+          </a>
+        </header>
+
+        <div
+          id="compat-error"
+          class="alert alert-danger row rounded-0 d-none"
+          role="alert"
+        >
+          Sorry but your browser does not support some of new HTML5 features!
+          Try using latest version of Google Chrome or Firefox.
         </div>
 
-        <a href="#" id="resizer" aria-label="Expand/Collapse" class="col-auto text-decoration-none" style="color: #3474A8">
-            <svg id="resizer-expand" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrows-angle-expand" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707"/>
-            </svg>
-            <svg id="resizer-collapse" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrows-angle-contract collapse" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707M15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707"/>
-            </svg>
-        </a>
-    </header>
-
-    <div id="compat-error" class="alert alert-danger row rounded-0 d-none" role="alert">
-        Sorry but your browser does not support some of new HTML5 features! Try using latest version of Google Chrome or Firefox.
-    </div>
-
-    <!-- <div class="row text-center p-3 align-items-stretch" id="dropzone" onclick="dropzoneClick(this)">
+        <!-- <div class="row text-center p-3 align-items-stretch" id="dropzone" onclick="dropzoneClick(this)">
         <div class="d-flex border border-info-subtle rounded-1 align-items-center justify-content-center">
             <div id="drop-text">
                 <b>Drop file here</b> to load content or click on this box to open file dialog.<br/>
@@ -67,78 +168,161 @@
         </div>
     </div> -->
 
-    <div id="output-box" class="container-fluid">
-        <div class="input-group">
+        <div id="output-box" class="container-fluid">
+          <div class="input-group">
             <select id="tables" class="form-select" title="Table"></select>
 
             <div class="dropdown ms-2">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenu1"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                    Export
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    <li><a class="dropdown-item" href="#" onclick="exportAllToCsv()">All tables to CSV</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="exportSelectedTableToCsv()">Selected table to CSV</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="exportQueryTableToCsv()">Query table to CSV</a></li>
-                </ul>
+              <button
+                class="btn btn-outline-secondary dropdown-toggle"
+                type="button"
+                id="dropdownMenu1"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Export
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li>
+                  <a class="dropdown-item" href="#" onclick="exportAllToCsv()"
+                    >All tables to CSV</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onclick="exportSelectedTableToCsv()"
+                    >Selected table to CSV</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onclick="exportQueryTableToCsv()"
+                    >Query table to CSV</a
+                  >
+                </li>
+              </ul>
             </div>
-        </div>
+          </div>
 
-        <div class="d-flex mt-3 mb-3">
-            <div id="sql-editor" class="form-control form-control-lg col me-2"></div>
-            <button class="btn btn-primary col-auto" id="sql-run" type="submit" onclick="executeSql(this)">Execute</button>
-        </div>
+          <div class="d-flex mt-3 mb-3">
+            <div
+              id="sql-editor"
+              class="form-control form-control-lg col me-2"
+            ></div>
+            <button
+              class="btn btn-primary col-auto"
+              id="sql-run"
+              type="submit"
+              onclick="executeSql(this)"
+            >
+              Execute
+            </button>
+          </div>
 
-        <div class="alert alert-danger" id="error" style="display: none"></div>
-        <div class="alert alert-info" id="info" style="display: none"></div>
+          <div
+            class="alert alert-danger"
+            id="error"
+            style="display: none"
+          ></div>
+          <div class="alert alert-info" id="info" style="display: none"></div>
 
-        <div class="row pb-4">
+          <div class="row pb-4">
             <div class="overflow-x-auto">
-                <table id="data" class="table table-sm table-bordered table-hover table-striped">
-                    <thead>
-                    <tr></tr>
-                    </thead>
-                    <tbody class="table-group-divider"></tbody>
-                </table>
+              <table
+                id="data"
+                class="table table-sm table-bordered table-hover table-striped"
+              >
+                <thead>
+                  <tr></tr>
+                </thead>
+                <tbody class="table-group-divider"></tbody>
+              </table>
             </div>
-
+          </div>
         </div>
+      </div>
+
     </div>
-</div>
+    <!-- End app-wrapper -->
 
-<div id="bottom-bar" class="d-flex position-sticky justify-content-center bottom-0 pb-4 d-none pe-none">
-    <div class="row bg-white border border-dark shadow p-3 rounded-2 pe-auto">
-        <button class="btn btn-outline-secondary btn-sm lh-1 col-auto" id="page-prev" type="submit" onclick="setPage(this, false)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-left-fill" viewBox="0 0 16 16">
-                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+      <div
+        id="bottom-bar"
+        class="d-flex position-sticky justify-content-center bottom-0 pb-4 d-none pe-none"
+      >
+        <div
+          class="row bg-white border border-dark shadow p-3 rounded-2 pe-auto"
+        >
+          <button
+            class="btn btn-outline-secondary btn-sm lh-1 col-auto"
+            id="page-prev"
+            type="submit"
+            onclick="setPage(this, false)"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-caret-left-fill"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"
+              />
             </svg>
-        </button>
-        <a href="javascript:void(0)" data-bs-toggle="tooltip" class="text-decoration-none col-auto" onclick="setPage(this)" id="pager"></a>
-        <button class="btn btn-outline-secondary btn-sm lh-1 col-auto" id="page-next" type="submit" onclick="setPage(this, true)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+          </button>
+          <a
+            href="javascript:void(0)"
+            data-bs-toggle="tooltip"
+            class="text-decoration-none col-auto"
+            onclick="setPage(this)"
+            id="pager"
+          ></a>
+          <button
+            class="btn btn-outline-secondary btn-sm lh-1 col-auto"
+            id="page-next"
+            type="submit"
+            onclick="setPage(this, true)"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-caret-right-fill"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+              />
             </svg>
-        </button>
-    </div>
-</div>
+          </button>
+        </div>
+      </div>
 
-<footer class="col text-center text-secondary py-2 my-1 small" id="footer">
-    Basierend auf der Arbeit von Juraj Novák (&copy; 2024; Url: <a href="https://yuraj11.github.io" class="text-decoration-none">https://yuraj11.github.io</a>) 
-    <br>
-</footer>
+    <footer class="col text-center text-secondary py-2 my-1 small" id="footer">
+      Basierend auf der Arbeit von Juraj Novák (&copy; 2024; Url:
+      <a href="https://yuraj11.github.io" class="text-decoration-none"
+        >https://yuraj11.github.io</a
+      >)
+      <br />
+    </footer>
 
-<input type="file" id="dropzone-dialog" style="opacity: 0;display:none">
+    <input type="file" id="dropzone-dialog" style="opacity: 0; display: none" />
 
-<script src="js/jquery-3.7.1.min.js"></script>
-<script src="js/filereader.js"></script>
-<script src="js/sql-wasm.js?v=1100"></script>
-<script src="js/select2.min.js?v=4013"></script>
-<script src="js/ace/ace.js?v=1323"></script>
-<script src="js/bootstrap.bundle.min.js?v=532"></script>
-<script src="js/mindmup-editabletable.js"></script>
-<script src="js/jszip.min.js"></script>
-<script src="js/FileSaver.min.js"></script>
-<script src="js/main.js?v=18"></script>
-
-</body>
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/filereader.js"></script>
+    <script src="js/sql-wasm.js?v=1100"></script>
+    <script src="js/select2.min.js?v=4013"></script>
+    <script src="js/ace/ace.js?v=1323"></script>
+    <script src="js/bootstrap.bundle.min.js?v=532"></script>
+    <script src="js/mindmup-editabletable.js"></script>
+    <script src="js/jszip.min.js"></script>
+    <script src="js/FileSaver.min.js"></script>
+    <script src="js/main.js?v=18"></script>
+  </body>
 </html>
