@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="utf-8" />
-    <meta name="description" content="sqlite file viewer" />
+    <meta name="description" content="sqlite Datei anzeiger" />
     <meta name="keywords" content="sqlite,viewer,db,database,online" />
     <meta name="author" content="Juraj Novák" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,13 +14,13 @@
     <link rel="image_src" href="img/icon.png" />
     <link rel="icon" type="image/png" href="img/icon.png" />
     <!-- TODO: Change metadata -->
-    <meta property="og:url" content="https://inloop.github.io/sqlite-viewer/" />
+    <meta property="og:url" content="https://doemeyer.github.io/sqlite-viewer/" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="SQLite Viewer" />
-    <meta property="og:description" content="sqlite file viewer" />
+    <meta property="og:description" content="Sqlite Datei Anzeiger" />
     <meta
       property="og:image"
-      content="https://inloop.github.io/sqlite-viewer/img/icon.png"
+      content="https://doemeyer.github.io/sqlite-viewer/img/icon.png"
     />
   </head>
   <body>
@@ -35,13 +35,13 @@
         <div
           class="d-flex justify-content-between align-items-center px-2 py-2 bg-white border-bottom"
         >
-          <h6 class="mb-0 text-primary fw-semibold">Recent Queries</h6>
+          <h6 class="mb-0 text-primary fw-semibold">Letzte Abfragen</h6>
           <button
             id="clear-history-btn"
             class="btn btn-sm btn-outline-danger"
-            title="Clear all history"
+            title="Verlauf löschen"
           >
-            Clear
+            Löschen
           </button>
         </div>
         <div
@@ -56,7 +56,7 @@
       <button
         id="sidebar-toggle"
         class="position-fixed btn btn-light border shadow-sm sidebar-toggle"
-        aria-label="Toggle query history"
+        aria-label="Verlauf umschalten"
       >
         <svg
           class="icon-expand"
@@ -87,24 +87,23 @@
       </button>
 
       <div id="main-container" class="container shadow bg-white flex-grow-1">
-        <header id="header" class="row align-items-center p-4 mb-3">
+        <header id="header" class="row align-items-center px-2 py-2 mb-3">
           <img
             src="img/logo.svg"
-            width="54"
-            height="54"
+            width="36"
+            height="36"
             class="col-auto p-0"
-            alt="Database logo"
+            alt="Datenbank Logo"
           />
 
           <div class="col">
             <h4 class="mb-0">SQLite Viewer</h4>
-            <p class="mb-0">view sqlite file online</p>
           </div>
 
           <a
             href="#"
             id="resizer"
-            aria-label="Expand/Collapse"
+            aria-label="Auf-/Zuklappen"
             class="col-auto text-decoration-none"
             style="color: #3474a8"
           >
@@ -144,8 +143,8 @@
           class="alert alert-danger row rounded-0 d-none"
           role="alert"
         >
-          Sorry but your browser does not support some of new HTML5 features!
-          Try using latest version of Google Chrome or Firefox.
+          Dein Browser unterstützt leider nicht alle HTML5 Features!
+          Versuch die neueste Version von Google Chrome oder Firefox.
         </div>
 
         <!-- <div class="row text-center p-3 align-items-stretch" id="dropzone" onclick="dropzoneClick(this)">
@@ -170,7 +169,7 @@
 
         <div id="output-box" class="container-fluid">
           <div class="input-group">
-            <select id="tables" class="form-select" title="Table"></select>
+            <select id="tables" class="form-select" title="Tabelle"></select>
 
             <div class="dropdown ms-2">
               <button
@@ -185,7 +184,7 @@
               <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                 <li>
                   <a class="dropdown-item" href="#" onclick="exportAllToCsv()"
-                    >All tables to CSV</a
+                    >Alle Tabellen zu CSV</a
                   >
                 </li>
                 <li>
@@ -193,7 +192,7 @@
                     class="dropdown-item"
                     href="#"
                     onclick="exportSelectedTableToCsv()"
-                    >Selected table to CSV</a
+                    >Gewählte Tabelle zu CSV</a
                   >
                 </li>
                 <li>
@@ -201,7 +200,7 @@
                     class="dropdown-item"
                     href="#"
                     onclick="exportQueryTableToCsv()"
-                    >Query table to CSV</a
+                    >Abfragetabelle zu CSV</a
                   >
                 </li>
               </ul>
@@ -219,7 +218,7 @@
               type="submit"
               onclick="executeSql(this)"
             >
-              Execute
+              Ausführen
             </button>
           </div>
 

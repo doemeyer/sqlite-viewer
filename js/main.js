@@ -1,6 +1,7 @@
 "use strict";
 
-const SQL_WASM_PATH = "https://inloop.github.io/sqlite-viewer/js/sql-wasm.wasm";
+const SQL_WASM_PATH =
+  "https://doemeyer.github.io/sqlite-viewer/js/sql-wasm.wasm";
 
 const SQL_FROM_REGEX = /FROM\s+((?=['"])((["'])(?<g1>[^'"]+))|(?<g2>\w+))/mi;
 const SQL_LIMIT_REGEX = /LIMIT\s+(\d+)(?:\s*,\s*(\d+))?/mi;
@@ -144,11 +145,11 @@ const QueryHistory = {
         const hours = Math.floor(minutes / 60);
         const days = Math.floor(hours / 24);
 
-        if (seconds < 60) return 'Just now';
-        if (minutes < 60) return `${minutes} min ago`;
-        if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-        if (days === 1) return 'Yesterday';
-        if (days < 7) return `${days} days ago`;
+        if (seconds < 60) return 'Gerade eben';
+        if (minutes < 60) return `${minutes} Min. her`;
+        if (hours < 24) return `${hours} Std. her`;
+        if (days === 1) return 'Gestern';
+        if (days < 7) return `${days} Tage her`;
 
         const date = new Date(timestamp);
         const yearAgo = now - (365 * 24 * 60 * 60 * 1000);
@@ -166,7 +167,7 @@ const QueryHistory = {
         if (!container) return;
 
         if (this.queries.length === 0) {
-            container.innerHTML = '<div class="text-center text-muted p-4 small">No queries yet. Execute a query to see it here.</div>';
+            container.innerHTML = '<div class="text-center text-muted p-4 small">Noch keine Abfragen. Führe eine Abfrage aus, um sie hier zu sehen.</div>';
             return;
         }
 
@@ -205,7 +206,7 @@ const QueryHistory = {
 
     // Clear all history
     clearHistory() {
-        if (confirm('Clear all query history? This cannot be undone.')) {
+        if (confirm('Gesamten Abfrage-Verlauf löschen? Das kann nicht rückgängig gemacht werden.')) {
             this.queries = [];
             this.saveHistory();
             this.renderHistory();
@@ -390,7 +391,7 @@ function loadDB(arrayBuffer) {
             const rowCount = getTableRowsCount(name);
             loadedTableNames.push(name);
             const tableType = type !== "table" ? `, ${type}` : "";
-            tableList.append(`<option value="${name}">${name} (${rowCount} rows${tableType})</option>`);
+            tableList.append(`<option value="${name}">${name} (${rowCount} Zeilen${tableType})</option>`);
         }
         tables.free();
 
@@ -473,7 +474,7 @@ function resetTableList() {
     tables.empty();
     tables.append("<option></option>");
     tables.select2({
-        placeholder: "Select a table",
+        placeholder: "Tabelle wählen",
         theme: "bootstrap-5",
         templateSelection: selectFormatter,
         templateResult: selectFormatter
@@ -563,7 +564,7 @@ function setPage(el, next) {
     if (typeof next !== "undefined") {
         pageToSet = (next ? limit.currentPage : limit.currentPage - 2);
     } else {
-        const page = window.prompt("Go to page");
+        const page = window.prompt("Gehe zu Seite");
         if (!isNaN(page) && page >= 1 && page <= limit.pages) {
             pageToSet = page - 1;
         } else {
@@ -584,7 +585,7 @@ function refreshPagination(query) {
         const pagePrev = $("#page-prev");
         const pageNext = $("#page-next");
 
-        pager.attr("title", `Row count: ${limit.rowCount}`);
+        pager.attr("title", `Zeilenanzahl: ${limit.rowCount}`);
         bootstrap.Tooltip.getOrCreateInstance("#pager").hide();
         pager.text(limit.currentPage + " / " + limit.pages);
 
@@ -685,7 +686,7 @@ function renderQuery(query) {
     sel.free();
 
     if (isEmptyTable) {
-        infoBox.text("No data for given select.");
+        infoBox.text("Keine Daten für diese Abfrage.");
         infoBox.show();
     }
 
@@ -704,7 +705,7 @@ function renderBlobItem(tr, bytes) {
     span.title = "Blob";
     const downloadLink = document.createElement("a");
     downloadLink.href = "javascript:void(0)";
-    downloadLink.innerText = `Download (${formatBytes(bytes.length)})`;
+    downloadLink.innerText = `Herunterladen (${formatBytes(bytes.length)})`;
     downloadLink.onclick = function () {
         saveAs(new Blob([bytes]), "blob");
     };
