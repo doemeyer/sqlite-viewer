@@ -5,10 +5,7 @@ SQLite Viewer
 
 *View SQLite file online. Uses [sql.js](https://github.com/sql-js/sql.js) for parsing sqlite files.*
 
-You can also load remote files (using JS ajax, remote server must send `Access-Control-Allow-Origin:*`):
-`http://inloop.github.io/sqlite-viewer/?url=http://example.com/data.sqlite`
 
-![](/img/preview.png?raw=true "Example sqlite")
 
 ### License
     Licensed under the Apache License, Version 2.0 (the "License");
