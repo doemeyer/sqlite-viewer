@@ -337,7 +337,7 @@ function initialize() {
             return results[1] || 0;
         }
     };
-    const loadUrlDB = "examples/Chinook_Sqlite.sqlite";
+    const loadUrlDB = "examples/Beispieldatensatz_Kundendaten.db";
     if (loadUrlDB != null) {
         setIsLoading(true);
         const xhr = new XMLHttpRequest();
