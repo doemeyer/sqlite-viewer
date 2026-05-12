@@ -337,7 +337,7 @@ function initialize() {
             return results[1] || 0;
         }
     };
-    const loadUrlDB = "examples/pokedex.sqlite";
+    const loadUrlDB = "examples/museum.db";
     if (loadUrlDB != null) {
         setIsLoading(true);
         const xhr = new XMLHttpRequest();
