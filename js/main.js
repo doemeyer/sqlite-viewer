@@ -501,7 +501,7 @@ function dropzoneClick() {
 }
 
 function doDefaultSelect(name) {
-    const defaultSelect = `SELECT * FROM '${name}' LIMIT 0,30`;
+    const defaultSelect = `SELECT * FROM '${name}';
     editor.setValue(defaultSelect, -1);
     renderQuery(defaultSelect);
 }
