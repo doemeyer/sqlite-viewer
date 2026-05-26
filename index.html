@@ -36,13 +36,47 @@
           class="d-flex justify-content-between align-items-center px-2 py-2 bg-white border-bottom"
         >
           <h6 class="mb-0 text-primary fw-semibold">Letzte Abfragen</h6>
-          <button
-            id="clear-history-btn"
-            class="btn btn-sm btn-outline-danger"
-            title="Verlauf löschen"
-          >
-            Löschen
-          </button>
+          <div class="d-flex gap-1 align-items-center">
+            <button
+              id="clear-history-btn"
+              class="btn btn-sm btn-outline-danger"
+              title="Verlauf löschen"
+            >
+              Löschen
+            </button>
+            <button
+              id="sidebar-toggle"
+              class="btn btn-sm btn-light border sidebar-toggle"
+              aria-label="Verlauf umschalten"
+            >
+              <svg
+                class="icon-expand"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
+                />
+              </svg>
+              <svg
+                class="icon-collapse"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
         <div
           id="query-history-list"
@@ -51,40 +85,6 @@
           <!-- Query items will be rendered here by JavaScript -->
         </div>
       </aside>
-
-      <!-- Sidebar Toggle Button -->
-      <button
-        id="sidebar-toggle"
-        class="position-fixed btn btn-light border shadow-sm sidebar-toggle"
-        aria-label="Verlauf umschalten"
-      >
-        <svg
-          class="icon-expand"
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          fill="currentColor"
-          viewBox="0 0 16 16"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
-          />
-        </svg>
-        <svg
-          class="icon-collapse"
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          fill="currentColor"
-          viewBox="0 0 16 16"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
-          />
-        </svg>
-      </button>
 
       <div id="main-container" class="container shadow bg-white flex-grow-1">
         <header id="header" class="row align-items-center px-2 py-2 mb-3">

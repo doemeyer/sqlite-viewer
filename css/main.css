@@ -114,21 +114,25 @@ body {
     padding: 0;
 }
 
-/* Toggle button positioning */
+/* Toggle button - sits in sidebar header when open */
 .sidebar-toggle {
-    left: 280px;
+    color: #3474A8;
+    z-index: 1040;
+    line-height: 1;
+    padding: 4px 6px;
+}
+
+/* Toggle button - fixed tab at left edge when sidebar is collapsed */
+.query-sidebar.collapsed .sidebar-toggle {
+    position: fixed;
+    left: 0;
     top: 20px;
     width: 36px;
     height: 48px;
-    border-left: none;
-    border-radius: 0 0.375rem 0.375rem 0;
-    z-index: 1040;
-    transition: left 0.3s ease;
-    color: #3474A8;
-}
-
-.query-sidebar.collapsed ~ .sidebar-toggle {
-    left: 0;
+    border-left: none !important;
+    border-radius: 0 0.375rem 0.375rem 0 !important;
+    background-color: #fff;
+    box-shadow: 2px 2px 6px rgba(0,0,0,.15);
 }
 
 .sidebar-toggle:hover {
@@ -149,14 +153,6 @@ body {
 
     .query-sidebar.collapsed {
         margin-left: -240px;
-    }
-
-    .sidebar-toggle {
-        left: 240px;
-    }
-
-    .query-sidebar.collapsed ~ .sidebar-toggle {
-        left: 0;
     }
 
     .query-tooltip {
@@ -180,14 +176,6 @@ body {
 
     .query-sidebar:not(.collapsed) {
         transform: translateX(0);
-    }
-
-    .sidebar-toggle {
-        left: 0 !important;
-    }
-
-    .query-sidebar:not(.collapsed) ~ .sidebar-toggle {
-        left: 280px !important;
     }
 
     /* Mobile overlay backdrop */
