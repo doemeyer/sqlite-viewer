@@ -506,10 +506,59 @@ function doDefaultSelect(name) {
     renderQuery(defaultSelect);
 }
 
+function refreshTableList() {
+    if (!db) return;
+
+    const tableList = $("#tables");
+    const currentSelection = tableList.val();
+
+    const stmt = db.prepare("SELECT * FROM sqlite_master WHERE type='table' OR type='view' ORDER BY name");
+    const newTableNames = [];
+    const tableData = [];
+
+    while (stmt.step()) {
+        const rowObj = stmt.getAsObject();
+        newTableNames.push(rowObj["name"]);
+        tableData.push(rowObj);
+    }
+    stmt.free();
+
+    if (JSON.stringify(newTableNames) === JSON.stringify(loadedTableNames)) return;
+
+    loadedTableNames = newTableNames;
+
+    try { tableList.select2('destroy'); } catch(e) {}
+    tableList.empty();
+    tableList.append("<option></option>");
+
+    for (const rowObj of tableData) {
+        const name = rowObj["name"];
+        const type = rowObj["type"];
+        const rowCount = getTableRowsCount(name);
+        const tableType = type !== "table" ? `, ${type}` : "";
+        tableList.append(`<option value="${name}">${name} (${rowCount} Zeilen${tableType})</option>`);
+    }
+
+    tableList.select2({
+        placeholder: "Tabelle wählen",
+        theme: "bootstrap-5",
+        templateSelection: selectFormatter,
+        templateResult: selectFormatter
+    });
+    tableList.on("change", function() {
+        doDefaultSelect(tableList.val());
+    });
+
+    if (currentSelection && newTableNames.includes(currentSelection)) {
+        tableList.val(currentSelection).trigger('change.select2');
+    }
+}
+
 function executeSql() {
     const query = editor.getValue();
     QueryHistory.addQuery(query);
     renderQuery(query);
+    refreshTableList();
     $("#tables").val(getTableNameFromQuery(query));
 }
 
