@@ -337,7 +337,7 @@ function initialize() {
             return results[1] || 0;
         }
     };
-    const loadUrlDB = "examples/Klassenarbeit.db";
+    const loadUrlDB = "examples/museum_groesser.db";
     if (loadUrlDB != null) {
         setIsLoading(true);
         const xhr = new XMLHttpRequest();
